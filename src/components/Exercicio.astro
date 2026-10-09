@@ -1,0 +1,31 @@
+---
+// Exercicio com gabarito recolhivel (<details> nativo: funciona sem JavaScript).
+// A numeracao e automatica (1., 2., ...) dentro de cada post.
+//
+//   <Exercicio pergunta="Quanto vale 2 + 2?">
+//   4.
+//   </Exercicio>
+//
+// O texto entre as tags e o gabarito (aceita Markdown e formulas).
+interface Props { pergunta: string }
+const { pergunta } = Astro.props;
+---
+
+<div class="exercicio cartao">
+  <p class="enunciado"><span class="num"></span> <slot name="pergunta">{pergunta}</slot></p>
+  <details>
+    <summary>Mostrar gabarito</summary>
+    <div class="gabarito"><slot /></div>
+  </details>
+</div>
+
+<style>
+  .exercicio { padding: 1rem 1.25rem; margin: 0.9rem 0; font-size: 0.97rem; }
+  .enunciado { margin: 0; }
+  .num { font-family: var(--f-mono); font-weight: 600; }
+  .num::before { counter-increment: exercicio; content: counter(exercicio) '.'; }
+  summary { cursor: pointer; margin-top: 0.8rem; font-family: var(--f-mono); font-size: 0.85rem; color: var(--texto-suave); }
+  summary:hover { color: var(--hover); }
+  .gabarito { margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px solid var(--linha); }
+  .gabarito :global(p:last-child) { margin-bottom: 0; }
+</style>

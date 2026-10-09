@@ -1,0 +1,47 @@
+---
+// Uso em qualquer post .mdx, SEM import:
+//   <Simulador id="shapley" />
+//
+// Para registrar um simulador novo:
+//   1. importe o componente aqui embaixo;
+//   2. acrescente uma entrada em INFO (titulo, aviso opcional, descricao para leitor de tela);
+//   3. acrescente a linha  {id === 'meu-id' && <Meu client:visible />}  no HTML.
+// (o import precisa ser estatico aqui para o `client:visible` funcionar)
+import SimFrame from './SimFrame.astro';
+import Cartao from './Cartao.astro';
+import Shapley from '../simulacoes/shapley/Shapley.tsx';
+import Resultado from '../simulacoes/shapley/Resultado.tsx';
+
+interface Props {
+  id: string;
+  /** Sobrescreve o titulo padrao da moldura. */
+  titulo?: string;
+}
+
+const INFO: Record<string, { titulo: string; aviso?: string; descricao: string }> = {
+  shapley: {
+    titulo: 'coalizões',
+    aviso: 'valores ilustrativos',
+    descricao:
+      'Três botões liga/desliga, um por variável. Abaixo deles, a previsão do modelo para a coalizão escolhida, em nanoteslas, e uma barra que vai da base (10 nT) até a previsão completa (130 nT).',
+  },
+  'shapley-resultado': { titulo: '', descricao: '' },
+};
+
+const { id, titulo } = Astro.props;
+const info = INFO[id];
+if (!info) {
+  throw new Error(
+    `Simulador "${id}" nao existe. Os disponiveis sao: ${Object.keys(INFO).join(', ')}. ` +
+      'Para criar um novo, veja o comentario no topo de src/components/Simulador.astro.',
+  );
+}
+---
+
+{id === 'shapley-resultado' ? (
+  <Cartao><Resultado /></Cartao>
+) : (
+  <SimFrame titulo={titulo ?? info.titulo} aviso={info.aviso} descricao={info.descricao}>
+    {id === 'shapley' && <Shapley client:visible />}
+  </SimFrame>
+)}

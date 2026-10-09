@@ -1,0 +1,59 @@
+---
+title: "Como dividir o crédito entre variáveis"
+date: 2026-10-09
+description: "Monte coalizões de variáveis e veja a ideia por trás do SHAP antes de qualquer fórmula."
+tags: [simulacao, shap, xai]
+status: maduro
+---
+
+Este post é um exemplo de texto com simulação (veja o código dele para copiar o formato). Imagine um modelo que prevê a intensidade de uma tempestade geomagnética a partir de três medidas do vento solar. Para um certo momento, ele prevê 130 nT. Quanto desse valor devemos creditar a cada medida?
+
+A resposta não é óbvia, porque as variáveis agem em conjunto: um campo magnético apontando para o sul faz bem menos estrago se o vento estiver parado. Em vez de discutir, vale experimentar.
+
+## Experimente
+
+Escolha quais variáveis entram na coalizão. O modelo de brinquedo abaixo mostra quanto ele prevê como se só essas variáveis fossem conhecidas.
+
+<Simulador id="shapley" />
+
+Repare que a contribuição de uma variável muda conforme quem já está na coalizão. O valor de Shapley resolve isso tirando a média da contribuição em todas as ordens possíveis de entrada.
+
+## O resultado: valores de Shapley
+
+<Simulador id="shapley-resultado" />
+
+<Matematica>
+
+Para $n$ variáveis, o valor de Shapley da variável $i$ é
+
+$$
+\phi_i = \sum_{S \subseteq N \setminus \{i\}} \frac{|S|!\,(n-|S|-1)!}{n!}\,\big[v(S \cup \{i\}) - v(S)\big]
+$$
+
+em que $v(S)$ é a previsão do modelo quando só as variáveis de $S$ são conhecidas. Cada termo entre colchetes é a contribuição marginal de $i$ naquela coalizão, e o peso diz quantas ordens de entrada levam a ela.
+
+A soma dos valores fecha com a previsão: $\sum_i \phi_i = v(N) - v(\varnothing)$.
+
+</Matematica>
+
+## Quando falha
+
+<Aviso>
+
+O Shapley supõe que dá para "tirar" uma variável do modelo. Com variáveis muito correlacionadas, o crédito pode ser dividido de um jeito que não reflete a física do problema. Isso importa muito quando duas variáveis carregam quase a mesma informação.
+
+</Aviso>
+
+## Exercícios
+
+<Exercicio pergunta="Na simulação, qual é a contribuição marginal de Bz quando a coalizão já contém a Velocidade?">
+
+Compare a previsão de (Bz sul, Velocidade) com a de (Velocidade): 120 − 12,5 = **107,5 nT**.
+
+</Exercicio>
+
+<Exercicio pergunta="Some os três valores de Shapley e compare com a previsão completa menos o valor base. O que você observa?">
+
+75 + 37,5 + 7,5 = 120 nT, que é exatamente 130 − 10. A soma dos créditos fecha com a previsão: essa propriedade se chama *eficiência*.
+
+</Exercicio>

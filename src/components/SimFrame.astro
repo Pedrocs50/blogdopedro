@@ -1,0 +1,27 @@
+---
+// Moldura padrao de todo simulador: titulo, aviso de "valores ilustrativos"
+// quando for o caso e um texto que descreve o que a simulacao mostra.
+// O simulador em si entra no <slot /> com `client:visible`.
+interface Props {
+  titulo: string;
+  aviso?: string;
+  /** Descricao em texto, para quem usa leitor de tela. */
+  descricao?: string;
+}
+const { titulo, aviso, descricao } = Astro.props;
+---
+
+<figure class="sim cartao">
+  <figcaption class="topo">
+    <span class="rotulo">Simulador · {titulo}</span>
+    {aviso && <span class="aviso-ilustrativo">{aviso}</span>}
+  </figcaption>
+  {descricao && <p class="sr-only">{descricao}</p>}
+  <slot />
+</figure>
+
+<style>
+  .sim { margin: 1.75rem 0; padding: 1.25rem 1.4rem 1.4rem; }
+  .topo { display: flex; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+  .aviso-ilustrativo { font-family: var(--f-mono); font-size: 0.74rem; color: var(--texto-suave); }
+</style>

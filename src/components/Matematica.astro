@@ -1,0 +1,17 @@
+---
+// "Interacao antes da formula": a matematica fica recolhida ate o leitor pedir.
+interface Props { rotulo?: string }
+const { rotulo = 'Mostrar a matemática' } = Astro.props;
+---
+
+<details class="mat cartao">
+  <summary>{rotulo}</summary>
+  <div class="corpo"><slot /></div>
+</details>
+
+<style>
+  .mat { padding: 0.7rem 1rem; margin: 1rem 0; font-size: 0.97rem; }
+  summary { cursor: pointer; font-size: 0.88rem; font-weight: 500; color: var(--destaque); }
+  summary:hover { color: var(--hover); }
+  .corpo { margin-top: 0.8rem; }
+</style>

@@ -1,0 +1,27 @@
+---
+import PaginaSimples from '../../components/PaginaSimples.astro';
+import PostLinha from '../../components/PostLinha.astro';
+import { getPosts, slugTag } from '../../lib/conteudo';
+import { url } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  const nomes = new Set(posts.flatMap((p) => p.data.tags));
+  return [...nomes].map((nome) => ({
+    params: { tag: slugTag(nome) },
+    props: { nome, posts: posts.filter((p) => p.data.tags.includes(nome)) },
+  }));
+}
+
+const { nome, posts } = Astro.props;
+---
+
+<PaginaSimples titulo={`#${nome}`}>
+  <ul>{posts.map((p) => <PostLinha post={p} />)}</ul>
+  <p class="volta mono"><a href={url('/tags/')}>← todas as tags</a></p>
+</PaginaSimples>
+
+<style>
+  ul { margin: 0; padding: 0; }
+  .volta { margin-top: 2rem; }
+</style>

@@ -1,0 +1,25 @@
+---
+// Moldura das paginas comuns (sobre, tags, 404): titulo e conteudo em uma coluna.
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+interface Props {
+  titulo: string;
+  lede?: string;
+}
+const { titulo, lede } = Astro.props;
+---
+
+<BaseLayout titulo={titulo} descricao={lede}>
+  <div class="container topo">
+    <h1>{titulo}</h1>
+    {lede && <p class="lede">{lede}</p>}
+  </div>
+  <div class="container">
+    <slot />
+  </div>
+</BaseLayout>
+
+<style>
+  .topo { padding-block: 2.5rem 1.8rem; }
+  .lede { margin: 0.8rem 0 0; color: var(--texto-suave); }
+</style>

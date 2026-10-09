@@ -1,0 +1,79 @@
+/* Estilos do simulador de Shapley. Usa os tokens de src/styles/global.css. */
+
+.shp-botoes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.shp-botao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0;
+  border: 1px solid var(--linha);
+  background: var(--superficie);
+  color: var(--texto);
+  cursor: pointer;
+  line-height: 1.3;
+}
+.shp-botao:hover { border-color: var(--hover); }
+.shp-botao[aria-pressed='true'] {
+  background: var(--destaque);
+  border-color: var(--destaque);
+  color: var(--sobre-destaque);
+}
+.shp-nome { font-size: 0.95rem; font-weight: 600; }
+.shp-sensor { font-size: 0.8rem; }
+.shp-dica { font-family: var(--f-mono); font-size: 0.72rem; opacity: 0.85; }
+
+.shp-saida {
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0;
+  background: var(--suave);
+}
+
+.shp-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.shp-coalizao { font-family: var(--f-mono); font-size: 0.82rem; color: var(--texto-suave); }
+.shp-valor { font-family: var(--f-titulo); font-size: 2.1rem; line-height: 1; white-space: nowrap; }
+.shp-num { font-family: var(--f-mono); font-size: 0.85rem; font-weight: 500; }
+.shp-nota { display: block; margin-top: 0.6rem; font-family: var(--f-mono); font-size: 0.72rem; color: var(--texto-suave); line-height: 1.5; }
+
+.shp-trilha {
+  height: 8px;
+  margin-top: 0.55rem;
+  border-radius: 0;
+  background: var(--suave);
+  overflow: hidden;
+}
+.shp-saida .shp-trilha { background: var(--linha); }
+.shp-barra {
+  height: 100%;
+  border-radius: 0;
+  background: var(--destaque);
+  transition: width 0.25s ease;
+}
+
+.shp-resultado { display: grid; gap: 0.9rem; font-size: 0.9rem; }
+.shp-item .shp-trilha { margin-top: 0.3rem; }
+.shp-conferencia {
+  margin: 0.4rem 0 0;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--linha);
+  font-family: var(--f-mono);
+  font-size: 0.74rem;
+  color: var(--texto-suave);
+  line-height: 1.5;
+}
+
+@media (max-width: 560px) {
+  .shp-botoes { grid-template-columns: 1fr; }
+}

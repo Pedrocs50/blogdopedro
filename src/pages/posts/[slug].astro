@@ -1,0 +1,64 @@
+---
+import { render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StatusBadge from '../../components/StatusBadge.astro';
+import Tag from '../../components/Tag.astro';
+import Simulador from '../../components/Simulador.astro';
+import Aviso from '../../components/Aviso.astro';
+import Exercicio from '../../components/Exercicio.astro';
+import Matematica from '../../components/Matematica.astro';
+import Cartao from '../../components/Cartao.astro';
+import { getPosts, dataISO, minutosDeLeitura } from '../../lib/conteudo';
+import { url } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: { post, anterior: posts[i + 1], proximo: posts[i - 1] },
+  }));
+}
+
+const { post, anterior, proximo } = Astro.props;
+const { Content } = await render(post);
+const d = post.data;
+
+// Componentes que voce pode usar dentro de um .mdx sem importar nada.
+const componentes = { Simulador, Aviso, Exercicio, Matematica, Cartao };
+---
+
+<BaseLayout titulo={d.title} descricao={d.description}>
+  <article class="container">
+    <header class="topo">
+      <h1>{d.title}</h1>
+      <p class="meta mono">
+        <time datetime={dataISO(d.date)}>{dataISO(d.date)}</time>
+        <span>· {minutosDeLeitura(post)} min</span>
+        {d.status && <StatusBadge status={d.status} />}
+      </p>
+      {d.description && <p class="lede">{d.description}</p>}
+    </header>
+
+    <div class="prosa">
+      <Content components={componentes} />
+    </div>
+
+    {d.tags.length > 0 && <p class="tags">{d.tags.map((t) => <Tag tag={t} />)}</p>}
+
+    <nav class="vizinhos mono" aria-label="Outros posts">
+      {anterior ? <a href={url(`/posts/${anterior.id}/`)}>← {anterior.data.title}</a> : <span />}
+      {proximo ? <a href={url(`/posts/${proximo.id}/`)}>{proximo.data.title} →</a> : <span />}
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .topo { padding-block: 2rem 1.5rem; }
+  .meta { display: flex; gap: 0.7rem; margin: 0.8rem 0 0; flex-wrap: wrap; }
+  .lede { margin: 1rem 0 0; font-size: 1.1rem; color: var(--texto-suave); }
+  .tags { display: flex; gap: 0.9rem; flex-wrap: wrap; margin-top: 2.5rem; }
+  .vizinhos { display: flex; justify-content: space-between; gap: 1.5rem; margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid var(--linha); }
+  .vizinhos a { text-decoration: none; color: var(--texto-suave); max-width: 45%; }
+  .vizinhos a:hover { color: var(--hover); text-decoration: underline; }
+  .vizinhos a:last-child { text-align: right; margin-left: auto; }
+</style>

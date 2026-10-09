@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostLinha from '../components/PostLinha.astro';
+import { getPosts } from '../lib/conteudo';
+import { SITE_DESCRICAO } from '../lib/site';
+
+const posts = await getPosts();
+---
+
+<BaseLayout>
+  <div class="container">
+    <p class="intro">{SITE_DESCRICAO}</p>
+    {posts.length === 0
+      ? <p class="mono">Nenhum post ainda. Rode <code>npm run novo "Meu primeiro post"</code>.</p>
+      : <ul>{posts.map((p) => <PostLinha post={p} />)}</ul>}
+  </div>
+</BaseLayout>
+
+<style>
+  .intro { margin: 1.5rem 0 2rem; font-size: 1.15rem; }
+  ul { margin: 0; padding: 0; }
+</style>

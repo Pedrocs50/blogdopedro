@@ -1,0 +1,14 @@
+---
+import { ESTAGIO_ROTULO, type Estagio } from '../lib/site';
+
+interface Props { status: Estagio }
+const { status } = Astro.props;
+const marca = { rascunho: '○', crescimento: '◐', maduro: '●' }[status];
+---
+
+<!-- O estagio se distingue por forma e texto, nao so por cor. -->
+<span class="selo"><span aria-hidden="true">{marca}</span> {ESTAGIO_ROTULO[status]}</span>
+
+<style>
+  .selo { font-family: var(--f-mono); font-size: 0.78rem; color: var(--texto-suave); white-space: nowrap; }
+</style>

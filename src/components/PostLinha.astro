@@ -1,0 +1,23 @@
+---
+import StatusBadge from './StatusBadge.astro';
+import { dataISO, type Post } from '../lib/conteudo';
+import { url } from '../lib/site';
+
+interface Props { post: Post }
+const { post } = Astro.props;
+const { title, date, status } = post.data;
+---
+
+<li>
+  <time class="mono" datetime={dataISO(date)}>{dataISO(date)}</time>
+  <a href={url(`/posts/${post.id}/`)}>{title}</a>
+  {status && <StatusBadge status={status} />}
+</li>
+
+<style>
+  li { display: flex; gap: 1.2rem; align-items: baseline; padding: 0.45rem 0; list-style: none; }
+  time { flex-shrink: 0; }
+  a { text-decoration: none; font-weight: 500; }
+  a:hover { text-decoration: underline; }
+  @media (max-width: 520px) { li { flex-wrap: wrap; gap: 0.1rem 1rem; } time { width: 100%; } }
+</style>

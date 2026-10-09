@@ -1,0 +1,54 @@
+{
+  "Cabecalho de post": {
+    "scope": "markdown,mdx",
+    "prefix": "post",
+    "description": "Cabecalho (frontmatter) de um post novo",
+    "body": [
+      "---",
+      "title: \"${1:Titulo}\"",
+      "date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "description: \"${2}\"",
+      "tags: [${3}]",
+      "status: ${4|rascunho,crescimento,maduro|}",
+      "---",
+      "",
+      "$0"
+    ]
+  },
+  "Simulador": {
+    "scope": "markdown,mdx",
+    "prefix": "sim",
+    "description": "Coloca um simulador no post (so em .mdx)",
+    "body": ["<Simulador id=\"${1|shapley,shapley-resultado|}\" />", "$0"]
+  },
+  "Aviso": {
+    "scope": "markdown,mdx",
+    "prefix": "aviso",
+    "description": "Caixa de aviso (so em .mdx)",
+    "body": ["<Aviso>", "", "${1:Texto do aviso.}", "", "</Aviso>", "$0"]
+  },
+  "Matematica recolhivel": {
+    "scope": "markdown,mdx",
+    "prefix": "mat",
+    "description": "Bloco recolhido 'Mostrar a matematica' (so em .mdx)",
+    "body": ["<Matematica>", "", "${1:Explique aqui, com formulas \\$x^2\\$.}", "", "</Matematica>", "$0"]
+  },
+  "Exercicio": {
+    "scope": "markdown,mdx",
+    "prefix": "ex",
+    "description": "Exercicio numerado com gabarito recolhivel (so em .mdx)",
+    "body": ["<Exercicio pergunta=\"${1:Qual e a pergunta?}\">", "", "${2:Resposta.}", "", "</Exercicio>", "$0"]
+  },
+  "Formula em bloco": {
+    "scope": "markdown,mdx",
+    "prefix": "form",
+    "description": "Formula em bloco (KaTeX)",
+    "body": ["\\$\\$", "${1:x^2 + y^2 = z^2}", "\\$\\$", "$0"]
+  },
+  "Bloco de codigo": {
+    "scope": "markdown,mdx",
+    "prefix": "cod",
+    "description": "Bloco de codigo com linguagem",
+    "body": ["```${1|python,js,bash,json|}", "${2}", "```", "$0"]
+  }
+}

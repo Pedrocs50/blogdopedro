@@ -1,0 +1,17 @@
+---
+import { GITHUB_URL, SITE_NOME } from '../lib/site';
+---
+
+<footer class="rodape">
+  <div class="container rodape-int">
+    <span>© {new Date().getFullYear()} {SITE_NOME}</span>
+    <a href={GITHUB_URL} rel="noopener">github ↗</a>
+  </div>
+</footer>
+
+<style>
+  .rodape { margin-top: 5rem; border-top: 1px solid var(--linha); }
+  .rodape-int { display: flex; justify-content: space-between; padding-block: 1.4rem 2.5rem; font-family: var(--f-mono); font-size: 0.8rem; color: var(--texto-suave); }
+  a { text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>

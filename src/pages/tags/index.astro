@@ -1,0 +1,17 @@
+---
+import PaginaSimples from '../../components/PaginaSimples.astro';
+import Tag from '../../components/Tag.astro';
+import { getPosts, contarTags } from '../../lib/conteudo';
+
+const tags = contarTags(await getPosts());
+---
+
+<PaginaSimples titulo="tags">
+  {tags.length === 0
+    ? <p class="mono">Nenhuma tag ainda.</p>
+    : <p class="tags">{tags.map(({ tag, n }) => <Tag {tag} {n} />)}</p>}
+</PaginaSimples>
+
+<style>
+  .tags { display: flex; flex-wrap: wrap; gap: 0.6rem 1.2rem; }
+</style>

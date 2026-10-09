@@ -1,0 +1,22 @@
+{
+  "files.associations": { "*.mdx": "mdx" },
+
+  // Escrever sem rolar para o lado, e deixar os atalhos (sim, aviso, ex...) aparecerem ao digitar
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": { "other": "on", "comments": "off", "strings": "on" },
+    "editor.snippetSuggestions": "top"
+  },
+  "[mdx]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": { "other": "on", "comments": "off", "strings": "on" },
+    "editor.snippetSuggestions": "top"
+  },
+
+  // Ctrl+V de uma imagem copia o arquivo para src/content/posts/img/ e insere o link
+  "markdown.copyFiles.destination": {
+    "src/content/posts/**": "img/${fileName}"
+  },
+  "markdown.editor.drop.copyIntoWorkspace": "always",
+  "markdown.editor.filePaste.copyIntoWorkspace": "always"
+}

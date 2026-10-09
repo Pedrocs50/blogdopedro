@@ -1,0 +1,8 @@
+---
+import PaginaSimples from '../components/PaginaSimples.astro';
+import { url } from '../lib/site';
+---
+
+<PaginaSimples titulo="404" lede="Esse endereço não existe (ainda).">
+  <a href={url('/')}>← voltar ao início</a>
+</PaginaSimples>

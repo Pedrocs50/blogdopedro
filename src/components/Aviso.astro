@@ -1,0 +1,9 @@
+---
+interface Props { rotulo?: string }
+const { rotulo = 'Atenção' } = Astro.props;
+---
+
+<aside class="aviso">
+  <span class="rotulo">{rotulo}</span>
+  <slot />
+</aside>

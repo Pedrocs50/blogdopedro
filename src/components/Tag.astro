@@ -1,0 +1,14 @@
+---
+import { slugTag } from '../lib/conteudo';
+import { url } from '../lib/site';
+
+interface Props { tag: string; n?: number }
+const { tag, n } = Astro.props;
+---
+
+<a class="tag" href={url(`/tags/${slugTag(tag)}/`)}>#{tag}{n !== undefined && <span> ({n})</span>}</a>
+
+<style>
+  .tag { font-family: var(--f-mono); font-size: 0.82rem; color: var(--texto-suave); text-decoration: none; }
+  .tag:hover { color: var(--hover); text-decoration: underline; }
+</style>
