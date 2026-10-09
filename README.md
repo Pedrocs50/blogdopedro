@@ -82,6 +82,14 @@ Para um post com componentes e simuladores, crie como `.mdx`:
 npm run novo "Título do meu post" -- --mdx
 ```
 
+**Não quer lembrar a sintaxe de nada?** Crie um post-modelo, que já vem com todos os recursos
+montados (fórmula no texto e em bloco, aviso, matemática recolhida, simulador e exercício com
+gabarito). Você só troca os textos e **apaga o que não for usar**:
+
+```bash
+npm run novo "Título do meu post" -- --modelo
+```
+
 Ou crie o arquivo na mão: na pasta `src/content/posts/`, novo arquivo `.md`, digite `post` e
 aperte Tab (atalho do VS Code que monta o cabeçalho).
 
@@ -173,6 +181,42 @@ $$
 ```
 
 A sintaxe é LaTeX, renderizada pelo KaTeX.
+
+#### Escrever fórmulas sem decorar LaTeX
+
+Existem quatro jeitos, do mais visual ao mais rápido. Use o que preferir em cada momento:
+
+1. **Ferramenta visual (recomendada para começar).** Com `npm run dev` rodando, abra
+   **http://localhost:4321/blogdopedro/ferramentas/formulas/**. Monte a fórmula no campo (digitando
+   ou pelo teclado matemático que aparece ao clicar no ícone de teclado), veja como o site vai
+   mostrá-la e clique em **"Copiar para o meio do texto"** ou **"Copiar em bloco"**. Depois é só
+   colar (`Ctrl+V`) no post. A página também aceita o caminho inverso: cole um LaTeX e veja o
+   resultado. Embaixo dela há a **cola rápida** com as fórmulas mais comuns (fração, raiz, soma,
+   integral, limite, matriz, letras gregas...).
+2. **Atalhos no VS Code** (digite e aperte Tab):
+
+   | Atalho | Resultado |
+   |---|---|
+   | `fm` | `$ ... $` no meio da frase |
+   | `form` | bloco `$$ ... $$` |
+   | `fracao` | `\frac{a}{b}` |
+   | `somatorio` | `\sum_{i=1}^{n} x_i` |
+   | `matriz2` | matriz 2×2 |
+   | `partes` | função definida por partes |
+
+3. **Pedir para o Claude.** Descreva a fórmula em palavras ("soma de i de 1 até n de x_i ao
+   quadrado, dividido por n") e peça o LaTeX. Cole o resultado na ferramenta para conferir.
+4. **Escrever na mão**, com a cola rápida da ferramenta aberta ao lado.
+
+Cuidados que valem para os quatro:
+- Use sempre `$...$` (sem espaço logo depois do primeiro `$` nem antes do último).
+- Chaves `{ }` agrupam: `x^{10}` é x elevado a 10, mas `x^10` é x elevado a 1 seguido de 0.
+- Para escrever texto dentro da fórmula, use `\text{...}`.
+- Se a fórmula estiver errada, o site mostra o código em vermelho em vez de quebrar.
+
+A ferramenta de fórmulas **vai para o site publicado também** (em `/ferramentas/formulas/`, sem
+link no menu e pedindo aos buscadores para não indexar). Ela é útil para você de qualquer
+computador, mas se preferir que só exista no seu computador, apague `src/pages/ferramentas/`.
 
 ### Componentes (só em `.mdx`, sem precisar importar nada)
 
@@ -345,6 +389,7 @@ acusa quase todo erro em segundos.
 ```
 src/content/posts/       seus textos (.md ou .mdx) e a pasta img/ com as imagens
 src/pages/               rotas do site: início, post, tags, sobre, rss
+src/pages/ferramentas/   ferramenta de fórmulas (visual), fora do menu
 src/components/          peças: Header, Footer, Aviso, Exercicio, Matematica, Simulador...
 src/simulacoes/          simuladores interativos, um por pasta
 src/styles/global.css    cores e fontes

@@ -50,5 +50,35 @@
     "prefix": "cod",
     "description": "Bloco de codigo com linguagem",
     "body": ["```${1|python,js,bash,json|}", "${2}", "```", "$0"]
+  },
+  "Formula no meio do texto": {
+    "scope": "markdown,mdx",
+    "prefix": "fm",
+    "description": "Formula no meio da frase: $...$",
+    "body": ["\\$${1:x^2}\\$$0"]
+  },
+  "Fracao": {
+    "scope": "markdown,mdx",
+    "prefix": "fracao",
+    "description": "\\frac{a}{b}",
+    "body": ["\\\\frac{${1:a}}{${2:b}}$0"]
+  },
+  "Somatorio": {
+    "scope": "markdown,mdx",
+    "prefix": "somatorio",
+    "description": "\\sum_{i=1}^{n}",
+    "body": ["\\\\sum_{${1:i=1}}^{${2:n}} ${3:x_i}$0"]
+  },
+  "Matriz 2x2": {
+    "scope": "markdown,mdx",
+    "prefix": "matriz2",
+    "description": "Matriz 2x2",
+    "body": ["\\\\begin{pmatrix} ${1:a} & ${2:b} \\\\\\\\ ${3:c} & ${4:d} \\\\end{pmatrix}$0"]
+  },
+  "Funcao por partes": {
+    "scope": "markdown,mdx",
+    "prefix": "partes",
+    "description": "Funcao definida por partes (cases)",
+    "body": ["f(x) = \\\\begin{cases} ${1:1} & ${2:x > 0} \\\\\\\\ ${3:0} & ${4:x \\\\le 0} \\\\end{cases}$0"]
   }
 }

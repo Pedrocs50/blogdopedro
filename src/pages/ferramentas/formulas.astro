@@ -1,0 +1,176 @@
+---
+// Ferramenta de escrita: monta formulas de forma visual e copia o texto pronto
+// para colar no post. Nao aparece no menu nem em buscadores (noindex).
+import katex from 'katex';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+// [o que eu quero, como escrevo em LaTeX]
+const COLA: [string, string][] = [
+  ['Fração', '\\frac{a}{b}'],
+  ['Potência', 'x^{2}'],
+  ['Índice', 'x_{i}'],
+  ['Raiz', '\\sqrt{x}'],
+  ['Raiz cúbica', '\\sqrt[3]{x}'],
+  ['Soma', '\\sum_{i=1}^{n} x_i'],
+  ['Integral', '\\int_0^1 x^2\\,dx'],
+  ['Limite', '\\lim_{x \\to 0} \\frac{\\sin x}{x}'],
+  ['Letras gregas', '\\alpha\\ \\beta\\ \\phi\\ \\theta\\ \\pi\\ \\sigma\\ \\mu\\ \\Delta'],
+  ['Vetor, chapéu, barra', '\\vec{v}\\ \\hat{x}\\ \\bar{x}'],
+  ['Comparações', 'a \\le b\\ \\ a \\ge b\\ \\ a \\ne b\\ \\ a \\approx b'],
+  ['Infinito', '\\infty'],
+  ['Conjuntos', 'x \\in A\\ \\ A \\subseteq B\\ \\ \\varnothing'],
+  ['Multiplicação', 'a \\cdot b\\ \\ a \\times b'],
+  ['Setas', 'A \\to B\\ \\ A \\Rightarrow B'],
+  ['Chaves', '\\{ x \\}'],
+  ['Texto dentro da fórmula', 'x > 0 \\text{ se } y = 1'],
+  ['Valor absoluto', '\\left| \\frac{a}{b} \\right|'],
+  ['Funções', '\\sin x\\ \\cos x\\ \\log n\\ \\ln n'],
+  ['Probabilidade, esperança', 'P(A \\mid B)\\ \\ \\mathbb{E}[X]'],
+  ['Matriz', '\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}'],
+  ['Por partes', 'f(x) = \\begin{cases} 1 & x > 0 \\\\ 0 & x \\le 0 \\end{cases}'],
+];
+
+const linhas = COLA.map(([nome, tex]) => ({
+  nome,
+  tex,
+  html: katex.renderToString(tex, { throwOnError: false }),
+}));
+---
+
+<BaseLayout titulo="fórmulas" descricao="Ferramenta para montar fórmulas e copiar o código pronto." noindex>
+  <div class="container topo">
+    <h1>fórmulas</h1>
+    <p class="lede">
+      Monte a fórmula (clicando no teclado ou digitando) e copie o código para colar no post.
+      Ou cole um LaTeX que você já tenha para ver como o site vai mostrar.
+    </p>
+  </div>
+
+  <div class="container">
+    <label class="rotulo" for="campo">1. Monte aqui</label>
+    <math-field id="campo" aria-label="Campo de fórmula"></math-field>
+
+    <label class="rotulo" for="latex">2. Código LaTeX (você também pode editar aqui)</label>
+    <textarea id="latex" rows="3" spellcheck="false" placeholder="Ex.: \frac{a}{b}"></textarea>
+
+    <p class="rotulo">3. Como vai aparecer no site</p>
+    <div id="previa" class="previa" aria-live="polite"></div>
+
+    <div class="acoes">
+      <button type="button" class="botao" id="copia-linha">Copiar para o meio do texto: $…$</button>
+      <button type="button" class="botao" id="copia-bloco">Copiar em bloco: $$…$$</button>
+      <span id="aviso-copia" class="rotulo" role="status"></span>
+    </div>
+
+    <h2>Cola rápida</h2>
+    <p class="lede">Escreva o que está na coluna do meio. As chaves <code>{'{ }'}</code> agrupam o que vem junto.</p>
+    <table class="cola">
+      <thead><tr><th>Quero</th><th>Escrevo</th><th>Fica</th></tr></thead>
+      <tbody>
+        {linhas.map((l) => (
+          <tr>
+            <td>{l.nome}</td>
+            <td><code>{l.tex}</code></td>
+            <td set:html={l.html} />
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</BaseLayout>
+
+<script>
+  import 'mathlive';
+  import { MathfieldElement } from 'mathlive';
+  import katex from 'katex';
+
+  // As fontes (as mesmas do KaTeX) ja sao carregadas pelo site; sons nao sao necessarios.
+  MathfieldElement.fontsDirectory = null;
+  MathfieldElement.soundsDirectory = null;
+
+  const campo = document.getElementById('campo') as MathfieldElement;
+  const latex = document.getElementById('latex') as HTMLTextAreaElement;
+  const previa = document.getElementById('previa') as HTMLElement;
+  const aviso = document.getElementById('aviso-copia') as HTMLElement;
+
+  function desenha() {
+    const tex = latex.value.trim();
+    if (!tex) {
+      previa.textContent = '';
+      return;
+    }
+    katex.render(tex, previa, { displayMode: true, throwOnError: false });
+  }
+
+  // campo visual -> texto
+  campo.addEventListener('input', () => {
+    latex.value = campo.value;
+    desenha();
+  });
+  // texto -> campo visual
+  latex.addEventListener('input', () => {
+    campo.value = latex.value;
+    desenha();
+  });
+
+  async function copia(texto: string) {
+    if (!latex.value.trim()) {
+      aviso.textContent = 'Monte uma fórmula primeiro.';
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(texto);
+      aviso.textContent = 'Copiado! Cole no post.';
+    } catch {
+      latex.select();
+      aviso.textContent = 'Não consegui copiar sozinho: o texto está selecionado, use Ctrl+C.';
+    }
+  }
+
+  document.getElementById('copia-linha')!.addEventListener('click', () => copia(`$${latex.value.trim()}$`));
+  document.getElementById('copia-bloco')!.addEventListener('click', () => copia(`$$\n${latex.value.trim()}\n$$`));
+</script>
+
+<style>
+  .topo { padding-block: 2.5rem 1.5rem; }
+  .lede { margin: 0.8rem 0 0; color: var(--texto-suave); }
+  label { display: block; margin: 1.6rem 0 0.4rem; }
+
+  math-field {
+    display: block;
+    width: 100%;
+    font-size: 1.7rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    color: var(--texto);
+    /* cores do MathLive no tom do site (sem o vermelho/azul padrao) */
+    --primary-color: var(--texto);
+    --caret-color: var(--texto);
+    --selection-background-color: var(--suave);
+    --selection-color: var(--texto);
+    --contains-highlight-background-color: var(--suave);
+  }
+
+  textarea {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    color: var(--texto);
+    font-family: var(--f-mono);
+    font-size: 0.9rem;
+    resize: vertical;
+  }
+
+  .previa { min-height: 4.5rem; padding: 0.5rem 0.9rem; border: 1px dashed var(--linha); overflow-x: auto; }
+  .acoes { display: flex; flex-wrap: wrap; gap: 0.7rem; align-items: center; margin-top: 1.1rem; }
+  button { cursor: pointer; }
+
+  h2 { margin-top: 3rem; }
+  .cola { margin-top: 1rem; border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+  .cola th, .cola td { border-bottom: 1px solid var(--linha); padding: 0.5rem 0.6rem; text-align: left; vertical-align: middle; }
+  .cola code { white-space: pre-wrap; word-break: break-all; }
+  @media (max-width: 640px) { .cola td:nth-child(2) { font-size: 0.8rem; } }
+</style>

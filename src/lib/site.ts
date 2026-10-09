@@ -1,6 +1,7 @@
 export const SITE_NOME = 'blogdopedro';
 export const SITE_DESCRICAO = 'O que eu aprendo, escrevo e testo.';
-export const GITHUB_URL = 'https://github.com/Pedrocs50/blogdopedro';
+// Link do rodape: perfil no GitHub.
+export const GITHUB_URL = 'https://github.com/Pedrocs50';
 
 export const NAV = [
   { href: '/tags/', rotulo: 'tags' },

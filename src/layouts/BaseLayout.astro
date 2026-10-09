@@ -15,9 +15,11 @@ import { SITE_NOME, SITE_DESCRICAO, url } from '../lib/site';
 interface Props {
   titulo?: string;
   descricao?: string;
+  /** true = pede aos buscadores para nao indexar a pagina (ferramentas internas). */
+  noindex?: boolean;
 }
 
-const { titulo, descricao = SITE_DESCRICAO } = Astro.props;
+const { titulo, descricao = SITE_DESCRICAO, noindex = false } = Astro.props;
 const tituloCompleto = titulo ? `${titulo} · ${SITE_NOME}` : SITE_NOME;
 ---
 
@@ -28,6 +30,7 @@ const tituloCompleto = titulo ? `${titulo} · ${SITE_NOME}` : SITE_NOME;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{tituloCompleto}</title>
     <meta name="description" content={descricao} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href={url('/favicon.svg')} />
     <link rel="alternate" type="application/rss+xml" title={SITE_NOME} href={url('/rss.xml')} />
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
