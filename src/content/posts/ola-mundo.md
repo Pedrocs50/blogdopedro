@@ -3,7 +3,6 @@ title: "Olá, mundo"
 date: 2026-10-09 09:00
 description: "Como escrever neste blog em 30 segundos."
 tags: [blog]
-status: maduro
 ---
 
 Este post é também a cola de como escrever aqui. Apague quando não precisar mais.
@@ -17,6 +16,8 @@ npm run novo "Título do meu post"
 ```
 
 Isso cria um arquivo em `src/content/posts/` já com o cabeçalho preenchido e abre no VS Code. É só escrever embaixo.
+
+O post nasce como **rascunho**: aparece só no seu computador e não vai para o site. Quando terminar, apague a linha `draft: true` do cabeçalho.
 
 ## Escrever
 

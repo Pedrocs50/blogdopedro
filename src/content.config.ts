@@ -35,8 +35,6 @@ const posts = defineCollection({
     tags: z.array(z.string()).default([]),
     // true = nao vai para o site publicado (so aparece no `npm run dev`)
     draft: z.boolean().default(false),
-    // opcional: mostra o quao "pronto" o post esta
-    status: z.enum(['rascunho', 'crescimento', 'maduro']).optional(),
   }),
 });
 

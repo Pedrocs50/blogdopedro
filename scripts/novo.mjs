@@ -42,7 +42,7 @@ title: ${JSON.stringify(titulo)}
 date: ${hoje}
 description: ""
 tags: []
-status: rascunho
+draft: true
 ---
 
 `;
@@ -92,7 +92,8 @@ fs.mkdirSync(pasta, { recursive: true });
 fs.writeFileSync(arquivo, cabecalho + (modelo ? corpoModelo : 'Escreva aqui.\n'));
 
 console.log(`Criado: ${arquivo}`);
-console.log('Dica: status pode ser rascunho, crescimento ou maduro. Apague a linha se nao quiser mostrar.');
+console.log('O post nasce como rascunho (draft: true): so aparece no seu computador (npm run dev).');
+console.log('Quando quiser publicar, APAGUE a linha "draft: true" e rode: npm run publicar');
 
 // tenta abrir no VS Code (se o comando "code" existir)
 spawnSync(`code "${arquivo}"`, { shell: true, stdio: 'ignore' });

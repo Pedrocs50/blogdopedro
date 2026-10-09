@@ -87,6 +87,11 @@ npm run novo "Título do meu post"
 Cria `src/content/posts/titulo-do-meu-post.md` com o cabeçalho pronto e abre no VS Code. Escreva
 embaixo do `---`. O nome do arquivo vira o endereço: `/posts/titulo-do-meu-post/`.
 
+**O post nasce como rascunho** (`draft: true` no cabeçalho): enquanto você escreve, ele aparece só
+no seu computador (`npm run dev`, com uma etiqueta "rascunho") e **não vai para o site**, mesmo
+que você rode `npm run publicar` por outro motivo. Quando terminar, **apague a linha
+`draft: true`** e publique. Só o que não tem essa linha aparece para as pessoas.
+
 Para um post com componentes e simuladores, crie como `.mdx`:
 
 ```bash
@@ -128,18 +133,19 @@ title: "Título do post"
 date: 2026-10-09
 description: "Uma frase que aparece em links e no RSS."
 tags: [matematica, estudo]
-status: rascunho
+draft: true
 ---
 ```
+
+(`draft: true` é o que o `npm run novo` coloca. Apague essa linha para publicar.)
 
 | Campo | Obrigatório | O que faz |
 |---|---|---|
 | `title` | sim | Título. **Use aspas** se tiver `:` no meio. |
 | `date` | sim | `AAAA-MM-DD`, ou com hora `AAAA-MM-DD HH:MM`. A lista do início é ordenada por ela, do mais novo para o mais antigo. A hora só serve para desempatar posts do mesmo dia (o site mostra só a data); o `npm run novo` já preenche com a hora de agora. |
 | `description` | não | Frase de apoio, aparece no topo do post, em links e no RSS. |
-| `tags` | não | `[a, b]`. Cada tag ganha a página `/tags/a/`. Evite acentos. |
-| `status` | não | `rascunho`, `crescimento` ou `maduro`: mostra ao leitor o quão pronto o post está. Apague a linha se não quiser mostrar. |
-| `draft` | não | `true` = o post **não** vai para o site publicado (aparece só no `npm run dev`). |
+| `tags` | não | `[a, b]`. Cada tag aparece ao lado do post na lista (e no fim do post) e ganha a página `/tags/a/`. Evite acentos. |
+| `draft` | não | `true` = rascunho: o post **não** vai para o site (aparece só no `npm run dev`). Para publicar, apague a linha. |
 
 Se esquecer ou errar algum campo, o build diz qual arquivo e qual campo.
 

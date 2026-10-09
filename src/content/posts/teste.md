@@ -3,8 +3,6 @@ title: "Teste"
 date: 2026-10-09
 description: ""
 tags: []
-status: rascunho
-draft: true
 ---
 
 Gostaria de dizer que estou estudando sobre temas bem interessantes para aprender sobre as inteligencias artificiais explicaveis.

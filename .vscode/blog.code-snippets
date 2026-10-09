@@ -9,7 +9,7 @@
       "date: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
       "description: \"${2}\"",
       "tags: [${3}]",
-      "status: ${4|rascunho,crescimento,maduro|}",
+      "draft: true",
       "---",
       "",
       "$0"

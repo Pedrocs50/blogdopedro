@@ -1,23 +1,31 @@
 ---
-import StatusBadge from './StatusBadge.astro';
+import Tag from './Tag.astro';
 import { dataISO, type Post } from '../lib/conteudo';
 import { url } from '../lib/site';
 
 interface Props { post: Post }
 const { post } = Astro.props;
-const { title, date, status } = post.data;
+const { title, date, tags, draft } = post.data;
+// Rascunhos so existem no `npm run dev`; no site publicado nunca chegam aqui.
+const rascunhoNoDev = import.meta.env.DEV && draft;
 ---
 
 <li data-id={post.id}>
   <time class="mono" datetime={dataISO(date)}>{dataISO(date)}</time>
   <a href={url(`/posts/${post.id}/`)}>{title}</a>
-  {status && <StatusBadge status={status} />}
+  {rascunhoNoDev && <span class="mono rascunho" title="Só aparece no seu computador (draft: true)">rascunho</span>}
+  {tags.length > 0 && <span class="tags">{tags.map((t) => <Tag tag={t} />)}</span>}
 </li>
 
 <style>
-  li { display: flex; gap: 1.2rem; align-items: baseline; padding: 0.45rem 0; list-style: none; }
+  li { display: flex; flex-wrap: wrap; gap: 0.15rem 1.2rem; align-items: baseline; padding: 0.45rem 0; list-style: none; }
   time { flex-shrink: 0; }
   a { text-decoration: none; font-weight: 500; }
   a:hover { text-decoration: underline; }
-  @media (max-width: 520px) { li { flex-wrap: wrap; gap: 0.1rem 1rem; } time { width: 100%; } }
+  .tags { display: inline-flex; flex-wrap: wrap; gap: 0 0.7rem; margin-left: auto; }
+  .rascunho { border: 1px dashed var(--texto-suave); padding: 0 0.4rem; font-size: 0.72rem; }
+  @media (max-width: 520px) {
+    time { width: 100%; }
+    .tags { margin-left: 0; }
+  }
 </style>

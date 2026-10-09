@@ -1,7 +1,6 @@
 ---
 import { render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import StatusBadge from '../../components/StatusBadge.astro';
 import Tag from '../../components/Tag.astro';
 import Simulador from '../../components/Simulador.astro';
 import Aviso from '../../components/Aviso.astro';
@@ -34,7 +33,6 @@ const componentes = { Simulador, Aviso, Exercicio, Matematica, Cartao };
       <p class="meta mono">
         <time datetime={dataISO(d.date)}>{dataISO(d.date)}</time>
         <span>· {minutosDeLeitura(post)} min</span>
-        {d.status && <StatusBadge status={d.status} />}
       </p>
       {d.description && <p class="lede">{d.description}</p>}
     </header>
