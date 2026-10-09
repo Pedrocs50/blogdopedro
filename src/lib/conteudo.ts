@@ -2,10 +2,64 @@ import { getCollection, type CollectionEntry } from 'astro:content';
 
 export type Post = CollectionEntry<'posts'>;
 
-/** Posts publicados, do mais novo para o mais antigo. Drafts so aparecem no `npm run dev`. */
+/**
+ * Posts publicados, do mais novo para o mais antigo. Drafts so aparecem no `npm run dev`.
+ * Empate (mesma data e hora): ordem alfabetica do titulo, para a ordem ser sempre a mesma.
+ */
 export async function getPosts(): Promise<Post[]> {
   const todos = await getCollection('posts', ({ data }) => import.meta.env.DEV || !data.draft);
-  return todos.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return todos.sort(
+    (a, b) =>
+      b.data.date.getTime() - a.data.date.getTime() ||
+      a.data.title.localeCompare(b.data.title, 'pt-BR'),
+  );
+}
+
+const MESES = [
+  'janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho',
+  'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
+];
+
+export type GrupoMes = { mes: number; nome: string; posts: Post[] };
+export type GrupoAno = { ano: number; total: number; meses: GrupoMes[] };
+
+/**
+ * Agrupa posts (ja ordenados do mais novo para o mais antigo) por ano e mes.
+ * E automatico: basta o post ter `date` no cabecalho.
+ */
+export function agruparPorAnoMes(posts: Post[]): GrupoAno[] {
+  const anos: GrupoAno[] = [];
+  for (const p of posts) {
+    const ano = p.data.date.getUTCFullYear();
+    const mes = p.data.date.getUTCMonth();
+    let a = anos.find((x) => x.ano === ano);
+    if (!a) anos.push((a = { ano, total: 0, meses: [] }));
+    let m = a.meses.find((x) => x.mes === mes);
+    if (!m) a.meses.push((m = { mes, nome: MESES[mes], posts: [] }));
+    m.posts.push(p);
+    a.total++;
+  }
+  return anos;
+}
+
+/** Minusculas e sem acento, para a busca achar "calculo" em "Cálculo". */
+export const normalizar = (s: string) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+/** Texto simples de um post (sem marcacao), usado so pelo indice de busca. */
+export function textoParaBusca(markdown: string): string {
+  return markdown
+    .replace(/^import .*$/gm, ' ')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\$\$[\s\S]*?\$\$/g, ' ')
+    .replace(/\$[^$\n]*\$/g, ' ')
+    .replace(/[#>*_`~|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 20000);
 }
 
 const fmt = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'UTC' });

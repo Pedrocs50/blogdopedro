@@ -26,10 +26,16 @@ if (spawnSync('npm run build', { stdio: 'inherit', shell: true }).status !== 0) 
 
 console.log('\n2/3  salvando...');
 gitVisivel('add', '-A');
-if (!git('status', '--porcelain').stdout.trim()) {
+const mudancas = git('status', '--porcelain').stdout.trimEnd();
+if (!mudancas) {
   console.log('Nada novo para publicar.');
   process.exit(0);
 }
+// Mostra o que vai ser enviado (A = novo, M = alterado, D = apagado), para voce
+// notar se algum rascunho ou teste esta indo junto.
+console.log('Vai enviar:');
+for (const linha of mudancas.split('\n')) console.log('  ' + linha);
+console.log('(para um post nao ir ao ar, ponha "draft: true" nele ou apague o arquivo)\n');
 if (gitVisivel('commit', '-m', mensagem).status !== 0) process.exit(1);
 
 console.log('\n3/3  enviando...');

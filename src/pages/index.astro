@@ -1,22 +1,189 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostLinha from '../components/PostLinha.astro';
-import { getPosts } from '../lib/conteudo';
-import { SITE_DESCRICAO } from '../lib/site';
+import { getPosts, agruparPorAnoMes } from '../lib/conteudo';
+import { SITE_DESCRICAO, url } from '../lib/site';
 
 const posts = await getPosts();
+const anos = agruparPorAnoMes(posts);
 ---
 
 <BaseLayout>
   <div class="container">
     <p class="intro">{SITE_DESCRICAO}</p>
-    {posts.length === 0
-      ? <p class="mono">Nenhum post ainda. Rode <code>npm run novo "Meu primeiro post"</code>.</p>
-      : <ul>{posts.map((p) => <PostLinha post={p} />)}</ul>}
+
+    {posts.length === 0 ? (
+      <p class="mono">Nenhum post ainda. Rode <code>npm run novo "Meu primeiro post"</code>.</p>
+    ) : (
+      <>
+        <div class="busca">
+          <label class="sr-only" for="busca">Buscar nos posts</label>
+          <input
+            id="busca"
+            type="search"
+            placeholder="buscar nos posts…"
+            autocomplete="off"
+            spellcheck="false"
+            data-indice={url('/search.json')}
+          />
+          <kbd aria-hidden="true">/</kbd>
+        </div>
+        <p id="status" class="mono status" role="status" aria-live="polite"></p>
+
+        <div id="lista">
+          {anos.map((a, i) => (
+            <details class="ano" open={i === 0}>
+              <summary>
+                <span class="titulo-grupo">{a.ano}</span>
+                <span class="n mono" data-total={a.total}>{a.total}</span>
+              </summary>
+              {a.meses.map((m) => (
+                <details class="mes" open>
+                  <summary>
+                    <span class="titulo-grupo">{m.nome}</span>
+                    <span class="n mono" data-total={m.posts.length}>{m.posts.length}</span>
+                  </summary>
+                  <ul>{m.posts.map((p) => <PostLinha post={p} />)}</ul>
+                </details>
+              ))}
+            </details>
+          ))}
+        </div>
+      </>
+    )}
   </div>
 </BaseLayout>
 
+<script>
+  // Busca ao vivo: filtra a lista enquanto voce digita (titulo, descricao, tags e texto do post).
+  const campo = document.getElementById('busca') as HTMLInputElement | null;
+  if (campo) {
+    const status = document.getElementById('status')!;
+    const itens = [...document.querySelectorAll<HTMLLIElement>('#lista li[data-id]')];
+    const grupos = [...document.querySelectorAll<HTMLDetailsElement>('#lista details')];
+
+    const normalizar = (s: string) =>
+      s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    let indice: Map<string, string> | null = null; // id -> texto sem acento
+    let carregando: Promise<void> | null = null;
+
+    // O indice (com o texto dos posts) so e baixado na primeira vez que a busca e usada.
+    function carrega() {
+      carregando ??= fetch(campo!.dataset.indice!)
+        .then((r) => r.json())
+        .then((lista: { id: string; texto: string }[]) => {
+          indice = new Map(lista.map((x) => [x.id, x.texto]));
+        })
+        .catch(() => {
+          indice = new Map(); // sem indice: cai no texto do titulo (ver abaixo)
+        });
+      return carregando;
+    }
+
+    // Estado original (qual ano/mes estava aberto) para restaurar ao limpar a busca.
+    for (const g of grupos) g.dataset.original = String(g.open);
+
+    function filtra() {
+      const termos = normalizar(campo!.value).split(/\s+/).filter(Boolean);
+      const buscando = termos.length > 0;
+      let achados = 0;
+
+      for (const li of itens) {
+        let ok = true;
+        if (buscando) {
+          const texto = indice?.get(li.dataset.id!) ?? normalizar(li.textContent ?? '');
+          ok = termos.every((t) => texto.includes(t));
+        }
+        li.hidden = !ok;
+        if (ok) achados++;
+      }
+
+      // Esconde meses/anos sem resultado, abre os que tem, e mostra a contagem de acertos.
+      for (const g of [...grupos].reverse()) {
+        const vis = g.querySelectorAll('li[data-id]:not([hidden])').length;
+        const total = g.querySelectorAll('li[data-id]').length;
+        g.hidden = buscando && vis === 0;
+        g.open = buscando ? vis > 0 : g.dataset.original === 'true';
+        const n = g.querySelector<HTMLElement>(':scope > summary .n');
+        if (n) n.textContent = buscando ? `${vis}/${total}` : String(total);
+      }
+
+      status.textContent = !buscando
+        ? ''
+        : achados === 0
+          ? `nenhum post encontrado para “${campo!.value.trim()}”`
+          : `${achados} ${achados === 1 ? 'post' : 'posts'}`;
+    }
+
+    campo.addEventListener('focus', carrega, { once: true });
+    campo.addEventListener('input', async () => {
+      await carrega();
+      filtra();
+    });
+    campo.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        campo.value = '';
+        filtra();
+      }
+    });
+    // "/" em qualquer lugar da pagina leva para a busca
+    document.addEventListener('keydown', (e) => {
+      const alvo = e.target as HTMLElement;
+      if (e.key === '/' && !e.ctrlKey && !e.metaKey && !/^(INPUT|TEXTAREA)$/.test(alvo.tagName)) {
+        e.preventDefault();
+        campo.focus();
+      }
+    });
+  }
+</script>
+
 <style>
-  .intro { margin: 1.5rem 0 2rem; font-size: 1.15rem; }
-  ul { margin: 0; padding: 0; }
+  .intro { margin: 1.5rem 0 1.6rem; font-size: 1.15rem; }
+
+  .busca { position: relative; }
+  input[type='search'] {
+    width: 100%;
+    padding: 0.6rem 2.4rem 0.6rem 0.9rem;
+    border: 1px solid var(--linha);
+    background: var(--superficie);
+    color: var(--texto);
+    font-family: var(--f-mono);
+    font-size: 0.9rem;
+    border-radius: 0;
+    appearance: none;
+  }
+  input[type='search']::placeholder { color: var(--texto-suave); }
+  input[type='search']:focus { outline: none; border-color: var(--texto); }
+  kbd {
+    position: absolute; right: 0.7rem; top: 50%; transform: translateY(-50%);
+    border: 1px solid var(--linha); padding: 0 0.4rem; font-size: 0.75rem; color: var(--texto-suave);
+  }
+  .status { min-height: 1.4rem; margin: 0.5rem 0 0.4rem; }
+
+  #lista { margin-top: 0.5rem; }
+  details { margin: 0; }
+  summary {
+    display: flex; align-items: baseline; gap: 0.7rem; cursor: pointer; list-style: none;
+    user-select: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary::before {
+    content: '▸'; font-family: var(--f-mono); color: var(--texto-suave);
+    display: inline-block; width: 1rem; transition: transform 0.15s;
+  }
+  details[open] > summary::before { transform: rotate(90deg); }
+  summary:hover .titulo-grupo { color: var(--hover); }
+
+  .ano { margin-top: 1.4rem; }
+  .ano > summary { padding-bottom: 0.4rem; border-bottom: 1px solid var(--linha); }
+  .ano > summary .titulo-grupo { font-family: var(--f-titulo); font-weight: 600; font-size: 1.3rem; }
+
+  .mes { margin: 0.6rem 0 0 1.2rem; }
+  .mes > summary .titulo-grupo { font-family: var(--f-mono); font-size: 0.85rem; color: var(--texto-suave); text-transform: lowercase; }
+  .n { font-size: 0.75rem; color: var(--texto-suave); }
+
+  ul { margin: 0.2rem 0 0.4rem; padding: 0; }
+  /* itens e grupos escondidos pela busca (sobrepoe o display: flex do item) */
+  :global(#lista [hidden]) { display: none !important; }
 </style>

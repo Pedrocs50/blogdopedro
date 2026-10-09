@@ -1,6 +1,6 @@
 ---
 title: "Olá, mundo"
-date: 2026-10-09
+date: 2026-10-09 09:00
 description: "Como escrever neste blog em 30 segundos."
 tags: [blog]
 status: maduro

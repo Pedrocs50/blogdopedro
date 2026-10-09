@@ -8,7 +8,7 @@ const { post } = Astro.props;
 const { title, date, status } = post.data;
 ---
 
-<li>
+<li data-id={post.id}>
   <time class="mono" datetime={dataISO(date)}>{dataISO(date)}</time>
   <a href={url(`/posts/${post.id}/`)}>{title}</a>
   {status && <StatusBadge status={status} />}

@@ -44,16 +44,27 @@ fatores: a sua conta é a chave do site).
    Ctrl+C para parar). O `/blogdopedro/` existe porque o repositório se chama `blogdopedro`: no
    GitHub Pages o site fica em um subcaminho.
 
-**Ligar a publicação (uma vez só)**
+**Colocar o site no ar (uma vez só, no site do GitHub)**
 
-3. No repositório do GitHub: Settings, Pages, Source: **GitHub Actions**.
-4. A cada `git push` na branch `main`, o Actions monta e publica o site. Acompanhe na aba
-   **Actions**: quando ficar verde, o site está em https://pedrocs50.github.io/blogdopedro/
-   (o primeiro deploy leva 1 a 3 minutos).
+O código já está no repositório https://github.com/Pedrocs50/blogdopedro. Faltam dois ajustes no
+GitHub, que só você pode fazer (exigem a sua conta):
 
-Se o primeiro Actions falhar, o motivo mais provável é o passo 3 ainda não ter sido feito: faça-o e clique em "Re-run jobs" na execução que falhou.
+3. **Repositório público.** O GitHub Pages grátis só publica a partir de repositório **público**
+   (em repositório privado exige um plano pago). Em Settings, General, role até **Danger Zone**,
+   **Change repository visibility**, **Change to public**. Antes de fazer isso, lembre que tudo
+   que está no repositório fica visível para qualquer pessoa, inclusive posts em rascunho.
+4. **Ligar o Pages.** Em Settings, **Pages**, em *Build and deployment*, **Source: GitHub
+   Actions**.
+5. **Disparar a publicação.** Aba **Actions**, clique na execução mais recente (a do último envio)
+   e em **Re-run all jobs**. Ela monta o site e publica; leva 1 a 3 minutos. Quando ficar verde,
+   o site está em **https://pedrocs50.github.io/blogdopedro/**.
 
-Dali em diante você só usa `npm run publicar`.
+Se a execução ficar vermelha, clique nela e abra o passo que falhou: o erro é o mesmo que você
+veria rodando `npm run build` no seu computador. Se a mensagem falar de Pages não habilitado, o
+passo 4 ainda não foi feito.
+
+Dali em diante é só o dia a dia: escrever e rodar `npm run publicar` (seção 6). Cada envio
+republica o site sozinho.
 
 > **Domínio/endereço:** o endereço e o subcaminho estão em `astro.config.mjs` (`SITE` e `BASE`).
 > Se um dia renomear o repositório para `pedrocs50.github.io` ou usar domínio próprio, deixe
@@ -124,13 +135,30 @@ status: rascunho
 | Campo | Obrigatório | O que faz |
 |---|---|---|
 | `title` | sim | Título. **Use aspas** se tiver `:` no meio. |
-| `date` | sim | `AAAA-MM-DD`. A lista do início é ordenada por ela. |
+| `date` | sim | `AAAA-MM-DD`, ou com hora `AAAA-MM-DD HH:MM`. A lista do início é ordenada por ela, do mais novo para o mais antigo. A hora só serve para desempatar posts do mesmo dia (o site mostra só a data); o `npm run novo` já preenche com a hora de agora. |
 | `description` | não | Frase de apoio, aparece no topo do post, em links e no RSS. |
 | `tags` | não | `[a, b]`. Cada tag ganha a página `/tags/a/`. Evite acentos. |
 | `status` | não | `rascunho`, `crescimento` ou `maduro`: mostra ao leitor o quão pronto o post está. Apague a linha se não quiser mostrar. |
 | `draft` | não | `true` = o post **não** vai para o site publicado (aparece só no `npm run dev`). |
 
 Se esquecer ou errar algum campo, o build diz qual arquivo e qual campo.
+
+### Como a página inicial organiza os posts
+
+Tudo é automático, a partir da `date` de cada post:
+
+- **Do mais novo para o mais antigo.** Dois posts no mesmo dia: o de hora mais tarde vem
+  primeiro (por isso o `npm run novo` grava a hora). Se ainda empatar, vale a ordem alfabética.
+- **Agrupado por ano e, dentro dele, por mês**, cada um com a quantidade de posts. Clique no
+  ano ou no mês para recolher ou abrir. Por padrão só o ano mais recente começa aberto.
+- **Busca ao vivo** no topo: filtra enquanto você digita. Procura no título, na descrição, nas
+  tags **e no texto do post**, sem diferenciar maiúsculas nem acentos (`calculo` acha "Cálculo"),
+  e várias palavras significam "todas elas". Durante a busca os anos e meses com resultado abrem
+  sozinhos e os sem resultado somem; `Esc` limpa e volta ao que estava. A tecla `/` leva o cursor
+  para a busca de qualquer lugar da página.
+
+A busca usa um arquivo `search.json` que o site gera sozinho a cada publicação (e só é baixado
+quando você clica na busca). Posts com `draft: true` não entram nele no site publicado.
 
 ### Conferir antes de publicar
 
@@ -298,6 +326,17 @@ otimiza a imagem sozinho (converte para webp e define o tamanho). Funciona em `.
 
 ## 6. Publicar e atualizar
 
+Como funciona o caminho do seu computador até o site:
+
+```
+você escreve  →  npm run publicar  →  GitHub (repositório)  →  Actions monta o site  →  Pages publica
+   (VS Code)      confere + envia        recebe os arquivos      (npm run build)          (~1 a 3 min)
+```
+
+Cada envio para a branch `main` republica o site inteiro. O que está no ar é sempre o que está no
+repositório: um post novo aparece na lista, e um post editado muda, depois que a execução do
+Actions fica verde.
+
 ```bash
 npm run publicar
 ```
@@ -306,7 +345,9 @@ Faz, nesta ordem:
 
 1. **Confere** se o site monta (`npm run build`). Se houver erro, **nada é enviado** e a mensagem
    aponta o arquivo.
-2. **Salva** tudo com um commit (mensagem padrão: "atualiza o blog").
+2. **Mostra o que vai enviar** (`A` = novo, `M` = alterado, `D` = apagado) e salva tudo com um
+   commit (mensagem padrão: "atualiza o blog"). **Leia essa lista**: se aparecer um rascunho ou
+   teste que você não quer no ar, ponha `draft: true` nele (ou apague) e rode de novo.
 3. **Envia** para o GitHub. O Actions publica sozinho; em cerca de 1 minuto o site atualiza.
 
 Com mensagem própria: `npm run publicar -- "post sobre Shapley"`.
@@ -370,7 +411,9 @@ Regras para manter os simuladores bons:
 |---|---|
 | `npm run publicar` diz que não está ligado ao GitHub | Falta o passo 6 da seção 1 (`git remote add ...`) |
 | Build falha com `title: Required` ou `date: Required` | Campo faltando no cabeçalho do post indicado na mensagem |
-| Build falha com `date: use o formato AAAA-MM-DD` | Escreva a data como `2026-10-09` (ano-mês-dia). Formatos como `10/01/2026` são recusados de propósito, porque dariam 1º de outubro em vez de 10 de janeiro |
+| Build falha com `date: use o formato AAAA-MM-DD` | Escreva a data como `2026-10-09` ou `2026-10-09 14:30` (ano-mês-dia, hora opcional). Formatos como `10/01/2026` são recusados de propósito, porque dariam 1º de outubro em vez de 10 de janeiro. Dias que não existem (`2026-02-31`) também são recusados |
+| Dois posts do mesmo dia na ordem errada | Coloque a hora na `date` do mais novo: `2026-10-09 18:30` |
+| A busca não acha uma palavra que está no post | Confirme que o post não está com `draft: true` (no site publicado ele fica fora da busca) e que a palavra está no texto: fórmulas `$...$`, código e links só entram pelo texto visível |
 | Erro longo com `YAMLParseError` ou `at Composer...` | Cabeçalho mal formado, quase sempre um `title` com `:` sem aspas. Use `title: "Assim: com aspas"` |
 | `Simulador "x" nao existe` | `id` errado ou simulador não registrado (seção 7). A mensagem lista os ids que existem |
 | Post `.md` mostra o texto de um `<Aviso>` mas sem a caixa | Componentes só funcionam em `.mdx`: renomeie o arquivo |

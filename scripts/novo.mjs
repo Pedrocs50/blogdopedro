@@ -25,8 +25,9 @@ const slug = titulo
   .replace(/[^a-z0-9]+/g, '-')
   .replace(/(^-|-$)/g, '');
 
-// data de hoje no fuso do computador (AAAA-MM-DD)
-const hoje = new Date().toLocaleDateString('sv-SE');
+// data e hora de agora no fuso do computador (AAAA-MM-DD HH:MM). A hora so serve para ordenar
+// dois posts do mesmo dia (o mais novo aparece primeiro); o site mostra apenas a data.
+const hoje = new Date().toLocaleString('sv-SE').slice(0, 16);
 
 const pasta = path.join('src', 'content', 'posts');
 const arquivo = path.join(pasta, `${slug}.${mdx ? 'mdx' : 'md'}`);
